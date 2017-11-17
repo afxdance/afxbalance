@@ -11,7 +11,10 @@
 
 
 class Team
-  def initialize(name, directors)
+  def initialize(name, directors, *dancers)
+    @name = name
+    @directors = directors
+    @dancers = dancers
 end
 
 class Dancer
@@ -64,27 +67,28 @@ class AttributesBuilder
     return @attributes
   end
   
-  def add_attribute(method, weight)
-    @attributes.push({method: method, weight: weight})
+  def add_attribute(property, weight)
+    @attributes.push({"property": property, "weight": weight})
     return self
   end
 end
 
-a = AttributesBuilder
-a.add_attribute(&:gender, 0.5)
-a.add_attribute(&:year, 0.5)
-attributes = AttributesBuilder.attributes
+attributes = AttributesBuilder
+attributes.add_attribute("gender", 0.5)
+attributes.add_attribute("year", 0.5)
 
-attributes = [
-    {
-        method: &:gender,
-        weight: 0.5,
-    },
-    {
-        method: &:year,
-        weight: 0.5,
-    }
-]
+
+
+# attributes = [
+#     {
+#         method: &:gender,
+#         weight: 0.5,
+#     },
+#     {
+#         method: &:year,
+#         weight: 0.5,
+#     }
+# ]
 
 
 
@@ -150,21 +154,25 @@ def get_team_ratio(attribute_ratio)
 end
 
 class Balancer
-  def initialize()
-    @partitions
-    @attributes
-    @totalRatio
+  # partitions is a 
+  # pass in AttributesBuilder Class
+  def initialize(partitions, attributesBuilder, totalRatio)
+    @partitions = partitions
+    @attributes = attributesBuilder
+    @totalRatio = totalRatio
   end
   
+  # 
   def balance_score()
     @partitions.map { |partition| balance_score_per_partition(partition) }.sum()
   end
   
-  def balance_score_per_partition(partition)
-    @attributes.map { |attribute| balance_score_per_attribute(partition, attribute) }.sum() ** 2
+  # 
+  def balance_score_per_partition(partitions)
+    @attributes.map { |attribute| balance_score_per_attribute(partitions, attribute) }.sum() ** 2
   end
   
-  def balance_score_per_attribute(partition, attribute)
+  def balance_score_per_attribute(partitions, attribute)
     values = @totalRatio[attribute].keys  # example: values == ['male', 'female']
     attribute.weight * sqrt(values.map { |value| balance_score_per_value(partition, attribute, value) }.sum())
   end
