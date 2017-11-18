@@ -10,11 +10,14 @@
 # This finds the optimal partition to put that item in to maintai n balance.
 
 
-class Team
+class Partition
   def initialize(name, directors, *dancers)
     @name = name
     @directors = directors
-    @dancers = dancers
+    @dancers = dancers.join(',')
+  end
+  
+  def 
 end
 
 class Dancer
@@ -58,41 +61,80 @@ def partitionBalanceScore(partition)
   perAttributeBalanceScores
 end
 
-class AttributesBuilder
+# AFXInitializer is the general base class that provides the info necessary to initialize all other classes
+class AFXInitializer
   def initialize()
     @attributes = []
+    @team_initialization = []
   end
   
   def attributes
     return @attributes
   end
   
-  def add_attribute(property, weight)
+  def add_property(property, weight)
     @attributes.push({"property": property, "weight": weight})
     return self
   end
+  
+  
+  def calculate_ratios(partition)
+    
+    
 end
 
-attributes = AttributesBuilder
-attributes.add_attribute("gender", 0.5)
-attributes.add_attribute("year", 0.5)
+##################### users point of view
+
+# Let us assume we are given the following:
+# the total number of auditionees : num_auditionees
+# the number of females and males : gender_ratio
+# the number of froshies, sophos, juniors, seniores : []
+# we are given all the teams 
+
+# Goal: user has teams, and 1 switching dancer who has listed two teams he/she would switch onto
+# recommend better team to switch on to between the two provided by dancer
+
+# training teams. don't project teams b/c those swiches should be manual.
 
 
+naive_teams = [afx_training1, afx_training2, afx_training3]
+#take into account number of directors later
+total_number_people = 680
+org_gender_male_fraction = .467
+org_gender_female_fraction = .533
+org_year_freshman_fraction = .440
+org_year_sophomore_ratio = .260
+org_year_junior_ratio = .200
+org_year_senior_fraction = .100
+
+
+attributes = AFXInitializer.new()
+attributes.add_property("gender", 0.5)
+attributes.add_property_attributes("gender", [male, female, other])
+
+attributes.add_property("year", 0.5)
+attributes.add_property_attributes("year", [freshman, sophomore, junior, senior])
+
+
+
+
+
+totalRatio = 
+
+
+
+##################### users point of view
 
 # attributes = [
 #     {
-#         method: &:gender,
+#         property: &:gender,
 #         weight: 0.5,
 #     },
 #     {
-#         method: &:year,
+#         property: &:year,
 #         weight: 0.5,
 #     }
 # ]
-
-
-
-
 
 
 
@@ -154,7 +196,7 @@ def get_team_ratio(attribute_ratio)
 end
 
 class Balancer
-  # partitions is a 
+  # partitions is a list 
   # pass in AttributesBuilder Class
   def initialize(partitions, attributesBuilder, totalRatio)
     @partitions = partitions
@@ -172,14 +214,17 @@ class Balancer
     @attributes.map { |attribute| balance_score_per_attribute(partitions, attribute) }.sum() ** 2
   end
   
+  #how balanced is this partition in terms of this attribute
   def balance_score_per_attribute(partitions, attribute)
     values = @totalRatio[attribute].keys  # example: values == ['male', 'female']
-    attribute.weight * sqrt(values.map { |value| balance_score_per_value(partition, attribute, value) }.sum())
+    attribute.weight * sqrt(values.map { |value| balance_score_per_value(partitions, attribute, value) }.sum())
   end
   
-  def balance_score_per_value(partition, attribute, value)
+  # partition is one team, attribute
+  # value is the organization's overall ideal ratio
+  def balance_score_per_value(partition, attribute, sub_attribute)
     # squared difference of team and org
-    (partitionRatio[attribute][value] - totalRatio[attribute][value]) ** 2
+    (partitionRatio[attribute][sub_attribute] - totalRatio[attribute][sub_attribute]) ** 2
   end
 end
 
